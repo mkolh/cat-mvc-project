@@ -8,8 +8,7 @@ function Cat(name, url){
 
 	newCat.name = name || "NO NAME";
 	newCat.url = url || "http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg";
-
-	console.log(newCat);
+	newCat.clicks = 0;
 }
 
 
@@ -38,11 +37,33 @@ addCat("Brett", "http://www.wchs4pets.org/wp-content/uploads/2015/03/cat_1-jpg.j
 
 var catHolderMaster = document.getElementById("current-cats");
 
+//render//
+
+//master iife
+(function render(cats){
+	//rendering
+	createNavBar(cats);
+
+	//add event listener to add cat button
+	var button = document.getElementById('new-cat-button');
+	button.addEventListener('click', function(){
+		newCatMachine();
+	});
+
+})(cats);
+
 
 function createNavBar (arr) {
 	//creat nav bar
 
-	var navBar = makeElem('div', 'row');
+	//if navBar, delete
+	var oldNav = document.querySelector('.cat-nav-bar');
+
+	if(oldNav){
+		oldNav.parentNode.removeChild(oldNav);
+	}
+
+	var navBar = makeElem('div', 'row', 'cat-nav-bar');
 
 	//populate nav bar
 
@@ -73,7 +94,6 @@ function createNavBar (arr) {
     //function to use
     function selectNewCat(i){
     	return function(){    		
-
     		renderCat(cats[i]); 
     	}
     }
@@ -83,17 +103,20 @@ function createNavBar (arr) {
     catHolderMaster.appendChild(navBar);
 }
 
+//create new cat adding input (could easily modify to accept other types of animals/constructors)
+function newCatMachine(){
+	//event listener already added to button in initial render
 
+	//select inputs and button
+	var name = document.getElementById("new-cat-name").value;
+	var url = document.getElementById('new-cat-url').value;
 
+	var newCat = new Cat(name, url);
+	cats.push(newCat);
 
-//render//
-
-//master iife
-(function render(cats){
-	//rendering
 	createNavBar(cats);
-})(cats);
 
+}
 //new cat loader
 
 function renderCat(cat){
@@ -120,9 +143,17 @@ function renderCat(cat){
 	var newCatImage = makeElem('img', 'img-rounded');
 	newCatImage.setAttribute('src', cat.url);
 
+	var newCatClicks = document.createTextNode(cat.clicks + " Clicks");
+
 
 	selectedCatHolder.appendChild(newCat);
 	selectedCatHolder.appendChild(newCatImage);
+	selectedCatHolder.appendChild(newCatClicks);
+
+	selectedCatHolder.addEventListener('click', function(){
+		cat.clicks++;
+		renderCat(cat);
+	});
 
 	//append cat to dom
 	var container = document.getElementById('container');
